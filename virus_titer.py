@@ -56,38 +56,38 @@ def count_titer(dilution_infection_dict, dilution_ratio):
     titer = int(10**lg_titer)
     return titer,lg_titer
 
-def main(init_dilution,dilution_ratio,rows_data):
-    #pprint(rows)
+def titer_calculate(init_dilution,dilution_ratio,rows_data):
+    pprint(rows_data)
 
-    rev_rows = get_reverse_rows(rows)
+    rev_rows = get_reverse_rows(rows_data)
     #pprint(rev_rows)
 
-    infected_cum = get_cumulative_for_dilutions (rows, 'y')
-    uninfected_cum = (get_cumulative_for_dilutions (rev_rows,'n'))
+    infected_cum = get_cumulative_for_dilutions (rows_data, '+')
+    uninfected_cum = (get_cumulative_for_dilutions (rev_rows,'-'))
     uninfected_cum = uninfected_cum[::-1]
 
     #print(infected_cum)
     #print(uninfected_cum)
-    dictionary = get_dilution_infection_dict(infected_cum, uninfected_cum,initial_reciproc_dilution, dilution_ratio)
+    dictionary = get_dilution_infection_dict(infected_cum, uninfected_cum,init_dilution, dilution_ratio)
     #print(dictionary)
     ED_50 = count_titer(dictionary, dilution_ratio)
     return ED_50
 
 
-y = 1
-n = 0
-z = None
-initial_reciproc_dilution = 1000
-dilution_ratio = 2
-
-row1 = ['n', 'n', 'y', 'n', 'n']
-row2 = ['n', 'n', 'n', 'n', 'n']
-row3 = ['n', 'n', 'n', 'n', 'y']
-row4 = ['n', 'n', 'n', 'y', 'y']
-row5 = ['n', 'n', 'n', 'y', 'y']
-row6 = ['n', 'n', 'n', 'y', 'y']
-
-rows = [row1, row2, row3, row4, row5, row6]
-
-
-print(main(1000, 2, rows))
+##y = 1
+##n = 0
+##z = None
+##initial_reciproc_dilution = 1000
+##dilution_ratio = 2
+##
+##row1 = ['n', 'n', 'y', 'n', 'n']
+##row2 = ['n', 'n', 'n', 'n', 'n']
+##row3 = ['n', 'n', 'n', 'n', 'y']
+##row4 = ['n', 'n', 'n', 'y', 'y']
+##row5 = ['n', 'n', 'n', 'y', 'y']
+##row6 = ['n', 'n', 'n', 'y', 'y']
+##
+##rows = [row1, row2, row3, row4, row5, row6]
+##
+##
+##print(main(1000, 2, rows))
