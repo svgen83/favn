@@ -1,88 +1,90 @@
 from tkinter import *
 from tkinter.ttk import Combobox
+##import tkinter as tk
 
-from virus_titer import main
-
-def calculate():
-    res1 = main(dilution, 1000, entries)
-    res2 = str(res1)
-    res = f"Титр антител {res2}"
-    lbl.configure(text=res)
-
-def add_row():
-    n = len(entries)
-    label = Label(window, text=f'Введите значения измерения {n+1}')
-    label.grid(row=n+1, column=0)
-    labels.append(label)
-    entry = Entry(window)
-    entry.grid(row=n+1, column=1)
-    entries.append(entry)
+from virus_titer import titer_calculate
 
 
-def remove_row():
-    if len(entries) > 1:  
-        entries.pop().destroy()
-        labels.pop().destroy()
+class App(Tk):
+    def __init__(self):
+        super().__init__()
+
+        self.entries = []
+        self.labels = []
+              
+        self.add_btn = Button(self, text="Добавить ряд",
+                             command=self.add_row)
+
+        self.name_3 = Label(text="Шаг разведения:")
+
+        self.diluttion_ratio = Combobox(self)  
+        self.diluttion_ratio['values'] = ( 2, 3, 4, 5, 10)  
+        self.diluttion_ratio.current(1)  # вариант по умолчанию
+
+        self.name_4 = Label(self,text="Начальное разведение:")
+        self.init_dilution = Entry(self)
+        self.init_dilution.insert(0, "50")
 
 
+        self.lbl = Label(self, text="")     
+        self.result_btn = Button(self, text="Результат", command=self.calculate)
+
+        self.remove_btn = Button(self, text="Удалить ряд", command=self.remove_row)
+
+        self.lbl.pack()
+        self.result_btn.pack()
+        self.add_btn.pack()
+        self.remove_btn.pack()
+        self.name_3.pack()
+        self.diluttion_ratio.pack()
+        self.name_4.pack()
+        self.init_dilution.pack()
+        self.add_row()
+        
+        
+    def print_data(self):
+        rows = []
+        datas = self.entries
+        for data in datas:
+            row = list(data.get())
+            rows.append(row)
+        print(rows)
+        print("Шаг разведения: {}".format(self.diluttion_ratio.get()))
+        print("Начальное разведение: {}".format(self.init_dilution.get()))
+        res=self.diluttion_ratio.get(),self.init_dilution.get(),rows
+        self.lbl.configure(text=res)
             
-window = Tk()
-window.title("Specific activity calculator")
-window.geometry('400x400')
 
-labels = []
-entries = []
-
-Button(window, text="Добавить измерение", command=add_row).grid(row=0, column=0)
-Button(window, text="Удалить измерение", command=remove_row).grid(row=0, column=1)
-Button(window, text="Вычисления", command=calculate).grid(row=0, column=3)
-Button(window, text="Начальное разведение").grid(row=0, column=2)
-lbl = Label(window, text="")  
-lbl.grid(column=0, row=15)
-
-add_row()
-
-combo = Combobox(window)  
-combo['values'] = ( 2, 3, 4, 5, 10)  
-combo.current(0)  # установите вариант по умолчанию  
-combo.grid(column=1, row=14)
-dilution = combo.get()
-
-dilut_lbl = Label(window, text=f"Исходное развдение{dilution}")  
-lbl.grid(column=0, row=25)
+    def add_row(self):
+        n = len(self.entries)
+        self.label_1 = Label(self, text=f'Введите значения измерения {n+1}')
+        self.label_1.pack()
+        self.labels.append(self.label_1)
+        self.entry = Entry(self)
+        self.entry.pack()
+        self.entries.append(self.entry)
 
 
+    def remove_row(self):
+        if len(self.entries) > 1:  
+            self.entries.pop().destroy()
+            self.labels.pop().destroy()
+        
 
+    def calculate(self):
+        init_dilution = int(self.init_dilution.get())
+        dilution_ratio = int(self.diluttion_ratio.get())
+        rows = []
+        datas = self.entries
+        for data in datas:
+            row = list(data.get())
+            rows.append(row)
+        rows_data = rows
+        res1 = titer_calculate(init_dilution,dilution_ratio,rows_data)
+        res2 = str(res1)
+        res = f"Титр антител {res2}"
+        self.lbl.configure(text=res)
 
-#frame = Frame(window, width=200, height=100)
-
-#for i in range(1,12):
-    #for n in range(1, 9):
-        #cb = Checkbutton(window)
-        #cb.grid(column=i, row=n)
-
-
-#for i in range(1, 9):
-    #lbl = Label(window, text=f"Ряд{i}")
-    #lbl.grid(column=0, row=i)
-
-
-
-#for n in range(list):
-    #Label(window, text='Введите значения каждого измерения').grid(row=20, column=20)
-    #Entry(window).grid(row=20, column=n+1)
-
-#txt = Text(window,width=10)
-#txt.grid(column=1, row=12)
-
-
-
-
-
-#lbl = Label(window, text="")
-#lbl.grid(column=5, row=15)
-#btn = Button(window, text="Результат", command=clicked)  
-#btn.grid(column=3, row=16)
-
-#app = Example()
-window.mainloop()
+if __name__ == "__main__":
+    app = App()
+    app.mainloop() 
