@@ -9,11 +9,18 @@ class App(Tk):
     def __init__(self):
         super().__init__()
 
+        self.title("Specific activity calculator")
+        self.geometry('600x400')
+
         self.entries = []
         self.labels = []
               
         self.add_btn = Button(self, text="Добавить ряд",
                              command=self.add_row)
+
+        self.help_button = Button(self, 
+              text="Помощь/О программе",
+              command=self.create_help_window)
 
         self.name_3 = Label(text="Шаг разведения:")
 
@@ -33,6 +40,7 @@ class App(Tk):
 
         self.lbl.pack()
         self.result_btn.pack()
+        self.help_button.pack()
         self.add_btn.pack()
         self.remove_btn.pack()
         self.name_3.pack()
@@ -40,8 +48,8 @@ class App(Tk):
         self.name_4.pack()
         self.init_dilution.pack()
         self.add_row()
-        
-        
+          
+               
     def print_data(self):
         rows = []
         datas = self.entries
@@ -84,6 +92,19 @@ class App(Tk):
         res2 = str(res1)
         res = f"Титр антител {res2}"
         self.lbl.configure(text=res)
+        
+
+    def create_help_window(self):
+        read_me = """Помощь.О программе
+Программа предназначена для определения титра антител методом FAVN
+
+Разработана во ФКУН Российский научно-исследовательский институт "Микроб", 2022 г."""
+##        read_me = 'DFAD'
+        self. newWindow = Toplevel(self)
+        self.labelExample = Label(self.newWindow, text = read_me)
+        self.labelExample.pack()
+        
+
 
 if __name__ == "__main__":
     app = App()
