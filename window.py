@@ -1,3 +1,4 @@
+import textwrap as tw
 from tkinter import *
 from tkinter.ttk import Combobox
 ##import tkinter as tk
@@ -9,7 +10,7 @@ class App(Tk):
     def __init__(self):
         super().__init__()
 
-        self.title("Specific activity calculator")
+        self.title("Калькулятор специфической активности")
 ##        self.geometry('600x400')
 
         self.entries = []
@@ -28,26 +29,26 @@ class App(Tk):
 
         self.dilut_ratio_lbl = Label(text="Шаг разведения:")
 
-        self.diluttion_ratio = Combobox(self)  
+        self.diluttion_ratio = Combobox(self, font='Times 14' )  
         self.diluttion_ratio['values'] = ( 2, 3, 4, 5, 10)  
         self.diluttion_ratio.current(1)  # вариант по умолчанию
 
         self.init_dilution_lbl = Label(self,text="Начальное разведение:")
-        self.init_dilution = Entry(self)
+        self.init_dilution = Entry(self, font='Times 14')
         self.init_dilution.insert(0, "50")
 
         
-        self.result_lbl = Label(self, text="")     
+        self.result_lbl = Label(self, text="",font='Times 14' )     
         self.serum_result_btn = Button(self, text="Определить титр антител", command=self.ed_calculate)
         self.virus_result_btn = Button(self, text="Определить титр вируса", command=self.id_calculate)
         self.remove_btn = Button(self, text="Удалить ряд", command=self.remove_row)
 
         self.result_lbl.pack()
-        self.serum_result_btn.pack()
-        self.virus_result_btn.pack()
+        self.serum_result_btn.pack(side=LEFT, fill = BOTH)
+        self.virus_result_btn.pack(side=LEFT, fill = BOTH)
         
-        self.help_button.pack()
-        self.reference_button.pack()
+        self.help_button.pack(side=RIGHT, fill = BOTH)
+        self.reference_button.pack(side=RIGHT, fill = BOTH)
               
         self.add_btn.pack()
         self.remove_btn.pack()
@@ -59,27 +60,14 @@ class App(Tk):
         self.init_dilution.pack()
         
         self.add_row()
-          
-               
-    def print_data(self):
-        rows = []
-        datas = self.entries
-        for data in datas:
-            row = list(data.get())
-            rows.append(row)
-        print(rows)
-        print("Шаг разведения: {}".format(self.diluttion_ratio.get()))
-        print("Начальное разведение: {}".format(self.init_dilution.get()))
-        res=self.diluttion_ratio.get(),self.init_dilution.get(),rows
-        self.lbl.configure(text=res)
-            
+                    
 
     def add_row(self):
         n = len(self.entries)
         self.label_1 = Label(self, text=f'Введите значения для образца {n+1}')
         self.label_1.pack()
         self.labels.append(self.label_1)
-        self.entry = Entry(self)
+        self.entry = Entry(self,font='Times 14' )
         self.entry.pack()
         self.entries.append(self.entry)
 
@@ -99,10 +87,8 @@ class App(Tk):
             row = list(data.get())
             rows.append(row)
         rows_data = rows
-        res1 = serum_titer_calculate(init_dilution,dilution_ratio,rows_data)
-        res2 = str(res1)
-        res = f"Титр антител {res2}"
-        self.result_lbl.configure(text=res)
+        result = serum_titer_calculate(init_dilution,dilution_ratio,rows_data)
+        self.result_lbl.configure(text=f"Титр антител {result}")
         
 
     def id_calculate(self):
@@ -114,10 +100,8 @@ class App(Tk):
             row = list(data.get())
             rows.append(row)
         rows_data = rows
-        res1 = virus_titer_calculate(init_dilution,dilution_ratio,rows_data)
-        res2 = str(res1)
-        res = f"Титр антител {res2}"
-        self.result_lbl.configure(text=res) 
+        result = virus_titer_calculate(init_dilution,dilution_ratio,rows_data)
+        self.result_lbl.configure(text=f"Титр вируса {result}") 
 
 
     def calculate_ui(self):
@@ -129,13 +113,40 @@ class App(Tk):
         
 
     def create_help_window(self):
-        read_me = """Помощь.О программе
-Программа предназначена для определения титра антител методом флуоресцирующих антител.
+        read_me = tw.dedent("""
+О программе
 
-Разработана во ФКУН Российский научно-исследовательский институт "Микроб", 2022 г."""
+Программа предназначена для расчета специфической активности сывороток и иммуноглобулина ,
+на основе результатов, полученных методом флуоресцирующих антител.
+Расчет осуществляется по методу Рида и Менча.
+
+Для расчета данных необходимо ввести обратное значение
+исходного разведения образца (например, если начальное разведение 1:50,
+то вводим значение 50), во вкладке "Кратность разведения"
+выбираем соответствующее значение (по умолчанию задано 3).
+
+Графу "Введите значения для образца" заполняем исходными данными в виде символов + и -.
+При этом символ + соответствует лунке, в которой наблюдается флуоресценция,
+символ - обозначает, что явление флуоресценции в лунке отсутствует.
+Ряд символов + и - вводится для каждого раститрованного образца по отдельности.
+При этом первый символ соответствует исходному (минимальному) разведению,
+а последний - максимальному.
+Общее количество символов + и - должно быть одинаковым для каждого ряда.
+
+Для добавления результатов исследования используется кнопка "Добавить ряд".
+Кнопка "Удалить ряд" используется для удаления ряда данных.
+
+Для расчета титра антител используется кнопка "Определить титр антител",
+и, соответственно для определения инфицирующей дозы вируса - кнопка "Определить титр вируса".
+
+Для определения специфической активности в Международных единицах, используется соответствующая кнопка, при нажатии которой появляется новое окно
+для ввода необходимых данных и получения результата.
+
+
+Разработана во ФКУН Российский противочумный институт "Микроб", 2022 г.""")
 
         self. help_window = Toplevel(self)
-        self.help_lbl = Label(self.help_window, text = read_me)
+        self.help_lbl = Label(self.help_window, text = read_me,font='Times 14' )
         self.help_lbl.pack()
 
 
@@ -154,8 +165,6 @@ class App(Tk):
         self.analit_entry = Entry(self.window)
         self.analit_entry.insert(0, "")
         
-
-
         self.titer_reference_lbl.pack()
         self.titer_reference_entry.pack()        
         self.ui_reference_lbl.pack()
@@ -167,8 +176,6 @@ class App(Tk):
         self.ui_analit_btn.pack()
         
         
-
-
 if __name__ == "__main__":
     app = App()
     app.mainloop() 
