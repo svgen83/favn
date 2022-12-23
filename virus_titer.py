@@ -1,4 +1,5 @@
 import math
+import datetime
 
 
 def get_reverse_rows (rows):
@@ -93,3 +94,10 @@ def virus_titer_calculate(init_dilution,dilution_ratio,rows_data):
     
     ID_50 = count_virus_titer(dictionary, dilution_ratio)
     return ID_50
+
+
+def keep_records(result, filepath):
+    data_log = datetime.date.today()
+    saved_protocol = f"Дата выполнения {data_log}. Результат {result}\n"
+    with open(filepath, "a+") as file:
+        file.write(saved_protocol)

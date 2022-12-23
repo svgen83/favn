@@ -1,9 +1,11 @@
 import textwrap as tw
+
+
 from tkinter import *
 from tkinter.ttk import Combobox
-##import tkinter as tk
 
-from virus_titer import serum_titer_calculate, virus_titer_calculate
+
+from virus_titer import serum_titer_calculate, virus_titer_calculate, keep_records
 
 
 class App(Tk):
@@ -11,7 +13,6 @@ class App(Tk):
         super().__init__()
 
         self.title("Калькулятор для расчета реакции нейтрализации по методу Рида и Менча")
-##        self.geometry('600x400')
 
         self.entries = []
         self.labels = []
@@ -76,7 +77,7 @@ class App(Tk):
         if len(self.entries) > 1:  
             self.entries.pop().destroy()
             self.labels.pop().destroy()
-        
+       
 
     def ed_calculate(self):
         init_dilution = int(self.init_dilution.get())
@@ -87,7 +88,10 @@ class App(Tk):
             row = list(data.get())
             rows.append(row)
         rows_data = rows
-        result = serum_titer_calculate(init_dilution,dilution_ratio,rows_data)
+        result = serum_titer_calculate(init_dilution,
+                                       dilution_ratio,
+                                       rows_data)
+        keep_records(result, "./ED50.txt")
         self.result_lbl.configure(text=f"Титр антител {result}")
         
 
@@ -100,7 +104,10 @@ class App(Tk):
             row = list(data.get())
             rows.append(row)
         rows_data = rows
-        result = virus_titer_calculate(init_dilution,dilution_ratio,rows_data)
+        result = virus_titer_calculate(init_dilution,
+                                       dilution_ratio,
+                                       rows_data)
+        keep_records(result, "./ID50.txt")
         self.result_lbl.configure(text=f"Титр вируса {result}") 
 
 
@@ -109,6 +116,7 @@ class App(Tk):
         ui_reference = int(self.ui_reference_entry.get())
         titer_analit = int(self.analit_entry.get())
         ui_analit = titer_analit*ui_reference/titer_reference
+        keep_records(ui_analit, "./activity in UI.txt")
         self.ui_analit_lbl.configure(text = ui_analit)
         
 
