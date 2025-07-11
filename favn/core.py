@@ -6,23 +6,27 @@ def get_reverse_rows(rows):
 
 
 def get_cumulative_for_dilutions(rows, kind):
-    cumulative_list = []
-    for wells in zip(*rows):  # столбцы
-        count = sum(1 for well in wells if well == kind)
-        cumulative_list.append(count)
-    return cumulative_list
+    counts = [sum(1 for well in col if well == kind) for col in zip(*rows)]
+    result = []
+    total = 0
+    for count in counts:
+        total += count
+        result.append(total)
+    return result
 
 
 def get_dilution_infection_dict(infected_cumulative, uninfected_cumulative,
                                 initial_reciproc_dilution, dilution_ratio):
-    dilution_list = []
-    infection_percent_list = []
-    for i, (k, m) in enumerate(zip(infected_cumulative, uninfected_cumulative)):
-        total = k + m
-        infection_percent = round((k * 100 / total)) if total > 0 else 0
-        dilution = initial_reciproc_dilution * (dilution_ratio ** i)
-        dilution_list.append(dilution)
-        infection_percent_list.append(infection_percent)
+    infection_percent_list = [
+        round((k * 100) / (k + m)) if k + m > 0 else 0
+        for k, m in zip(infected_cumulative, uninfected_cumulative)
+    ]
+    
+    dilution_list = [
+        initial_reciproc_dilution * dilution_ratio**i
+        for i in range(len(infected_cumulative))
+    ]
+    
     return dict(zip(dilution_list, infection_percent_list))
 
 
@@ -84,8 +88,11 @@ def serum_titer_calculate(init_dilution, dilution_ratio, rows_data):
     infected_cum = get_cumulative_for_dilutions(rows_data, '+')
     uninfected_cum = get_cumulative_for_dilutions(rev_rows, '-')
     uninfected_cum = uninfected_cum[::-1]
-    dictionary = get_dilution_infection_dict(infected_cum, uninfected_cum, init_dilution, dilution_ratio)
+    dictionary = get_dilution_infection_dict(
+        infected_cum,uninfected_cum,
+        init_dilution, dilution_ratio)
     return count_serum_titer(dictionary, dilution_ratio)
+
 
 
 def virus_titer_calculate(init_dilution, dilution_ratio, rows_data):
